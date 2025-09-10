@@ -4,8 +4,6 @@ import com.example.bankcards.dto.transfer.NewTransferRequestDto;
 import com.example.bankcards.dto.transfer.TransferResponseDto;
 import com.example.bankcards.entity.*;
 import com.example.bankcards.exception.ConflictException;
-import com.example.bankcards.exception.ConflictException;
-import com.example.bankcards.exception.ConflictException;
 import com.example.bankcards.exception.NotFoundException;
 import com.example.bankcards.mapper.TransferMapper;
 import com.example.bankcards.repository.CardRepository;
@@ -15,11 +13,8 @@ import com.example.bankcards.service.TransferService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.List;
 
 @Service

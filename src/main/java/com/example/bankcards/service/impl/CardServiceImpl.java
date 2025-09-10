@@ -58,6 +58,7 @@ public class CardServiceImpl implements CardService {
         User user = getUserByIdOrElseThrow(newCardDto.getOwnerId());
 
         Card card = cardMapper.convertNewCardDtoToEntity(newCardDto);
+        cardRepository.save(card);
 
         return null;
     }

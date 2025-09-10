@@ -18,7 +18,7 @@ public interface CardMapper {
     @Mapping(target = "status", constant = "ACTIVATE")
     @Mapping(target = "balance", defaultValue = "0.0")
     @Mapping(target = "expiresAt", source = "expiresAt", defaultExpression = "java(YearMonth.now().plusMonths(24))")
-    Card convertNewCardDtoToEntity(NewCardDto dto);
+    public Card convertNewCardDtoToEntity(NewCardDto dto);
 
     public Collection<CardDto> convertToDtoCollection(Collection<Card> entities);
 }

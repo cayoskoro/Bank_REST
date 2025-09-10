@@ -1,5 +1,6 @@
 package com.example.bankcards.entity;
 
+import com.example.bankcards.util.CardNumberEncryptor;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -26,12 +27,12 @@ public class Card {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    @Column(name = "number_encrypted", length = 512, nullable = false)
-    @Convert()
-    private String numberEncrypted;
+    @Column(name = "crypto_number", length = 512, nullable = false)
+    @Convert(converter = CardNumberEncryptor.class)
+    private String cryptoNumber;
 
-    @Column(name = "last_four_number", length = 4, nullable = false)
-    private String lastFourNumber;
+    @Column(name = "last_four_numbers", length = 4, nullable = false)
+    private String lastFourNumbers;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 32, nullable = false)
