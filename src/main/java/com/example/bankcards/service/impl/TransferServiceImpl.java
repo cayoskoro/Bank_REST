@@ -3,8 +3,8 @@ package com.example.bankcards.service.impl;
 import com.example.bankcards.dto.transfer.NewTransferRequestDto;
 import com.example.bankcards.dto.transfer.TransferResponseDto;
 import com.example.bankcards.entity.*;
-import com.example.bankcards.exception.CardExpiredException;
-import com.example.bankcards.exception.CardStatusConflictException;
+import com.example.bankcards.exception.ConflictException;
+import com.example.bankcards.exception.ConflictException;
 import com.example.bankcards.exception.ConflictException;
 import com.example.bankcards.exception.NotFoundException;
 import com.example.bankcards.mapper.TransferMapper;
@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -50,7 +52,7 @@ public class TransferServiceImpl implements TransferService {
 
         fromCard.setBalance(fromCard.getBalance().subtract(newTransferRequestDto.getAmount()));
         toCard.setBalance(fromCard.getBalance().add(newTransferRequestDto.getAmount()));
-
+        cardRepository.saveAll(List.of(toCard, fromCard));
 
         Transfer transfer = Transfer.builder()
                 .fromCard(fromCard)
@@ -96,7 +98,7 @@ public class TransferServiceImpl implements TransferService {
     private void throwIfCardIsNotActive(Card card) {
         if (card.getStatus() != CardStatus.ACTIVE) {
             log.info("Конфликт статуса карты. Карта id = {} не активна.", card.getId());
-            throw new CardStatusConflictException("Конфликт статуса карты. Карта id = " + card.getId()
+            throw new ConflictException("Конфликт статуса карты. Карта id = " + card.getId()
                     + " не активна.");
         }
     }
