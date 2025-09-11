@@ -1,6 +1,8 @@
 package com.example.bankcards.service.impl;
 
+import com.example.bankcards.dto.card.CardBalanceDto;
 import com.example.bankcards.dto.card.CardDto;
+import com.example.bankcards.dto.card.CardShortDto;
 import com.example.bankcards.dto.card.NewCardDto;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.CardStatus;
@@ -32,21 +34,35 @@ public class CardServiceImpl implements CardService {
     @Override
     public Collection<CardDto> getAllCards(int from, int size) {
         PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size);
-        return cardMapper.convertToDtoCollection(cardRepository.findAll(pageRequest).getContent());
+        Collection<CardDto> cardDtos = cardMapper.convertToDtoCollection(
+                cardRepository.findAll(pageRequest).getContent());
+        log.info("Запрос карт - {}", cardDtos);
+        return cardDtos;
     }
 
     @Override
-    public Collection<CardDto> getAllCards(long userId, int from, int size) {
+    public Collection<CardShortDto> getAllCards(long userId, int from, int size) {
         checkUserExists(userId);
         PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size);
-        return cardMapper.convertToDtoCollection(cardRepository.findAllByOwnerId(userId, pageRequest).getContent());
+        Collection<CardShortDto> cardDtos = cardMapper.convertToShortDtoCollection(
+                cardRepository.findAllByOwnerId(userId, pageRequest).getContent());
+        log.info("Запрос карт - {} пользователем id = {}", cardDtos, userId);
+        return cardDtos;
+    }
+
+    @Override
+    public CardBalanceDto getCardBalance(long userId, long cardId) {
+        User user = getUserByIdOrElseThrow(userId);
+        Card card = getCardByIdOrElseThrow(cardId);
+        throwIfUserIsNotCardOwner(card, user);
+        log.info("Запрос баланса пользователя = {} карты = {}", user.getId(), card.getId());
+        return cardMapper.convertToBalanceDto(card);
     }
 
     @Override
     @Transactional
     public CardDto addNewCard(NewCardDto newCardDto) {
         User user = getUserByIdOrElseThrow(newCardDto.getOwnerId());
-
         Card card = cardMapper.convertNewCardDtoToEntity(newCardDto);
         card
         return null;
@@ -54,13 +70,15 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public CardDto addNewCard(NewCardDto newCardDto) {
-        User user = getUserByIdOrElseThrow(newCardDto.getOwnerId());
+    public void requestBlockCard(long userId, long cardId) {
+        checkUserExists(userId);
+        Card card = getCardByIdOrElseThrow(cardId);
+        throwIfCardExpired(card);
+        throwIfCardBlocked(card);
 
-        Card card = cardMapper.convertNewCardDtoToEntity(newCardDto);
+        card.setBlockRequest(true);
         cardRepository.save(card);
-
-        return null;
+        log.info("Карта id = {} в состоянии запроса на удаление", card.getId());
     }
 
     @Override
@@ -68,12 +86,9 @@ public class CardServiceImpl implements CardService {
     public CardDto blockCard(long cardId) {
         Card card = getCardByIdOrElseThrow(cardId);
         throwIfCardExpired(card);
+        throwIfCardBlocked(card);
 
-        if (card.getStatus() == CardStatus.BLOCKED) {
-            throw new ConflictException("Карта id = " + cardId + " уже была заблокирована");
-        }
         card.setStatus(CardStatus.BLOCKED);
-
         CardDto cardDto = cardMapper.convertToDto(cardRepository.save(card));
         log.info("Карта заблокирована: {}", cardDto);
         return cardDto;
@@ -86,10 +101,10 @@ public class CardServiceImpl implements CardService {
         throwIfCardExpired(card);
 
         if (card.getStatus() == CardStatus.ACTIVE) {
-            throw new ConflictException("Карта id = " + cardId + " уже была активирована");
+            throw new ConflictException("Карта id = " + cardId + " активна");
         }
-        card.setStatus(CardStatus.ACTIVE);
 
+        card.setStatus(CardStatus.ACTIVE);
         CardDto cardDto = cardMapper.convertToDto(cardRepository.save(card));
         log.info("Карта активирована: {}", cardDto);
         return cardDto;
@@ -100,7 +115,7 @@ public class CardServiceImpl implements CardService {
     public void deleteCard(long cardId) {
         checkCardExists(cardId);
         cardRepository.deleteById(cardId);
-        log.info("Карта с cardId = {} удалена", cardId);
+        log.info("Карта id = {} удалена", cardId);
     }
 
     @Transactional
@@ -108,27 +123,41 @@ public class CardServiceImpl implements CardService {
         log.info("Проверка на просрочку карты.");
         if (card.getStatus() != CardStatus.EXPIRED && YearMonth.now().equals(card.getExpiresAt())) {
             card.setStatus(CardStatus.EXPIRED);
-            log.info("Карта cardId = {} стала просроченной.", card.getId());
+            log.info("Карта id = {} стала просроченной.", card.getId());
+        }
+    }
+
+    private void throwIfUserIsNotCardOwner(Card card, User user) {
+        Long ownerId = card.getOwner().getId();
+        if (!ownerId.equals(user.getId())) {
+            log.info("Пользователь id = {} не является владельцем карты id = {}", user.getId(), card.getId());
+            throw new ConflictException("Пользователь не является владельцем карты");
         }
     }
 
     private void throwIfCardExpired(Card card) {
         if (card.getStatus() == CardStatus.EXPIRED) {
-            throw new ConflictException("У карты по cardId = " + card.getId() + " истек срок действия");
+            throw new ConflictException("Карта id = " + card.getId() + " с истекшим сроком действия");
+        }
+    }
+
+    private void throwIfCardBlocked(Card card) {
+        if (card.getStatus() == CardStatus.BLOCKED) {
+            throw new ConflictException("Карта id = " + card.getId() + " заблокирована");
         }
     }
 
     private void checkCardExists(long cardId) {
         if (!cardRepository.existsById(cardId)) {
-            log.info("Карты с cardId = {} не существует", cardId);
-            throw new NotFoundException("Карты с cardId = " + cardId + " не существует");
+            log.info("Карты id = {} не существует", cardId);
+            throw new NotFoundException("Карты id = " + cardId + " не существует");
         }
     }
 
     private Card getCardByIdOrElseThrow(long cardId) {
         return cardRepository.findById(cardId).orElseThrow(() -> {
-            log.info("Карты с cardId = {} не существует", cardId);
-            return new NotFoundException("Карты с cardId = " + cardId + " не существует");
+            log.info("Карты id = {} не существует", cardId);
+            return new NotFoundException("Карты id = " + cardId + " не существует");
         });
     }
 

@@ -9,7 +9,6 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.UUID;
 
 @Data
 @Builder(toBuilder = true)
@@ -40,6 +39,9 @@ public class Card {
 
     @Column(name = "balance", precision = 19, scale = 2, nullable = false)
     private BigDecimal balance;
+
+    @Column(name = "block_request", nullable = false)
+    private boolean blockRequest = false;
 
     @Column(name = "expired_at", nullable = false)
     private YearMonth expiresAt;

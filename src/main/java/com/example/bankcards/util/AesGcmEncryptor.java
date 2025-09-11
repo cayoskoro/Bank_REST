@@ -1,57 +1,70 @@
 package com.example.bankcards.util;
 
-public class AesGcmEncryptor {
-    public static final String SHA_CRYPT = "SHA-256";
-    public static final String AES_ALGORITHM = "AES";
-    public static final String AES_ALGORITHM_GCM = "AES/GCM/NoPadding";
+import com.example.bankcards.config.EncryptorProperties;
 
-    public static final Integer IV_LENGTH_ENCRYPT = 12;
-    public static final Integer TAG_LENGTH_ENCRYPT = 16;
+import javax.crypto.Cipher;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.util.Base64;
 
-    public static final String LOCAL_PASSPHRASE = "mySecurePassphrase123!"; // Store securely
+public final class AesGcmEncryptor implements Encryptor {
+    private static final String SHA_CRYPT = "SHA-256";
+    private static final String AES_ALGORITHM = "AES";
+    private static final String AES_ALGORITHM_GCM = "AES/GCM/NoPadding";
+    private final EncryptorProperties encryptorProperties;
 
-    public String localEncrypt(String plainText) throws Exception {
-        byte[] iv = new byte[IV_LENGTH_ENCRYPT];
+    public AesGcmEncryptor(EncryptorProperties encryptorProperties) {
+        this.encryptorProperties = encryptorProperties;
+    }
+
+    public String encrypt(String input) throws Exception {
+        if (input == null) return null;
+        byte[] iv = new byte[encryptorProperties.getIvLength()];
         SecureRandom secureRandom = new SecureRandom();
         secureRandom.nextBytes(iv);
 
         SecretKeySpec aesKey = generateAesKeyFromPassphrase();
 
         Cipher cipher = Cipher.getInstance(AES_ALGORITHM_GCM);
-        GCMParameterSpec gcmSpec = new GCMParameterSpec(TAG_LENGTH_ENCRYPT * 8, iv);
+        GCMParameterSpec gcmSpec = new GCMParameterSpec(encryptorProperties.getTagLength() * 8, iv);
         cipher.init(Cipher.ENCRYPT_MODE, aesKey, gcmSpec);
 
-        byte[] encryptedBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
+        byte[] encryptedBytes = cipher.doFinal(input.getBytes(StandardCharsets.UTF_8));
 
-        byte[] combinedIvAndCipherText = new byte[iv.length + encryptedBytes.length];
-        System.arraycopy(iv, 0, combinedIvAndCipherText, 0, iv.length);
-        System.arraycopy(encryptedBytes, 0, combinedIvAndCipherText, iv.length, encryptedBytes.length);
+        byte[] combinedIvAndCipher = new byte[iv.length + encryptedBytes.length];
+        System.arraycopy(iv, 0, combinedIvAndCipher, 0, iv.length);
+        System.arraycopy(encryptedBytes, 0, combinedIvAndCipher, iv.length, encryptedBytes.length);
 
-        return Base64.getEncoder().encodeToString(combinedIvAndCipherText);
+        return Base64.getEncoder().encodeToString(combinedIvAndCipher);
     }
 
-    public String localDecrypt(String cipherText) throws Exception {
-        byte[] decodedCipherText = Base64.getDecoder().decode(cipherText);
+    public String decrypt(String encryptedInput) throws Exception {
+        if (encryptedInput == null) return null;
+        byte[] decodedEncryptedInput = Base64.getDecoder().decode(encryptedInput);
 
         SecretKeySpec aesKey = generateAesKeyFromPassphrase();
 
-        byte[] iv = new byte[IV_LENGTH_ENCRYPT];
-        System.arraycopy(decodedCipherText, 0, iv, 0, iv.length);
-        byte[] encryptedText = new byte[decodedCipherText.length - IV_LENGTH_ENCRYPT];
-        System.arraycopy(decodedCipherText, IV_LENGTH_ENCRYPT, encryptedText, 0, encryptedText.length);
+        byte[] iv = new byte[encryptorProperties.getIvLength()];
+        System.arraycopy(decodedEncryptedInput, 0, iv, 0, iv.length);
+        byte[] encryptedBytes = new byte[decodedEncryptedInput.length - encryptorProperties.getIvLength()];
+        System.arraycopy(decodedEncryptedInput, encryptorProperties.getIvLength(), encryptedBytes, 0,
+                encryptedBytes.length);
 
-        GCMParameterSpec gcmSpec = new GCMParameterSpec(TAG_LENGTH_ENCRYPT * 8, iv);
+        GCMParameterSpec gcmSpec = new GCMParameterSpec(encryptorProperties.getTagLength() * 8, iv);
         Cipher cipher = Cipher.getInstance(AES_ALGORITHM_GCM);
         cipher.init(Cipher.DECRYPT_MODE, aesKey, gcmSpec);
 
-        byte[] decryptedBytes = cipher.doFinal(encryptedText);
+        byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
 
         return new String(decryptedBytes, StandardCharsets.UTF_8);
     }
 
     private SecretKeySpec generateAesKeyFromPassphrase() throws Exception {
         MessageDigest sha256 = MessageDigest.getInstance(SHA_CRYPT);
-        byte[] keyBytes = sha256.digest(LOCAL_PASSPHRASE.getBytes(StandardCharsets.UTF_8));
+        byte[] keyBytes = sha256.digest(encryptorProperties.getPassphrase().getBytes(StandardCharsets.UTF_8));
         return new SecretKeySpec(keyBytes, AES_ALGORITHM);
     }
 }
