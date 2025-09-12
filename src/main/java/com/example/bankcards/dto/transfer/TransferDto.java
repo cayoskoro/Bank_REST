@@ -1,6 +1,5 @@
 package com.example.bankcards.dto.transfer;
 
-import com.example.bankcards.entity.TransferStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Value;

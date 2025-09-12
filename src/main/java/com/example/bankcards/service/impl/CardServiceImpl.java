@@ -89,6 +89,10 @@ public class CardServiceImpl implements CardService {
         throwIfCardExpired(card);
         throwIfCardBlocked(card);
 
+        if (!card.isBlockRequest()) {
+            log.info("Карте id = {} не требовалось блокировки по запросу.", card.getId());
+            throw new ConflictException("Карте не требовалось блокировки по запросу.");
+        }
         card.setStatus(CardStatus.BLOCKED);
         card.setBlockRequest(false);
         CardDto cardDto = cardMapper.convertToDto(cardRepository.save(card));

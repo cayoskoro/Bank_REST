@@ -1,6 +1,7 @@
 package com.example.bankcards.dto.card;
 
 import com.example.bankcards.entity.CardStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Value;
 
@@ -16,7 +17,13 @@ public class CardDto {
     private final String panMask;
     private final BigDecimal balance;
     private final CardStatus status;
+
+    @JsonFormat(pattern = "yyyy-MM")
     private final YearMonth expiresAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime updatedAt;
 }

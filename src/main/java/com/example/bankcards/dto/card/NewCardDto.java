@@ -25,6 +25,6 @@ public class NewCardDto {
     @Digits(integer = 19, fraction = 2)
     private final BigDecimal balance;
 
-    @JsonFormat(pattern = "MM/YY")
+    @JsonFormat(pattern = "yyyy-MM")
     private final YearMonth expiresAt;
 }

@@ -15,6 +15,7 @@ public class ApiErrorDto {
     private final String message;
     private final String reason;
     private final HttpStatus status;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime timestamp;
 }

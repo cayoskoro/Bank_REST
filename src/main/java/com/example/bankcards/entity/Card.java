@@ -1,6 +1,7 @@
 package com.example.bankcards.entity;
 
 import com.example.bankcards.util.CardNumberEncryptor;
+import com.example.bankcards.util.ExpiresAtAttributeConverter;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -44,6 +45,7 @@ public class Card {
     private boolean blockRequest;
 
     @Column(name = "expires_at", nullable = false)
+    @Convert(converter = ExpiresAtAttributeConverter.class)
     private YearMonth expiresAt;
 
     @Column(name = "created_at", nullable = false)
