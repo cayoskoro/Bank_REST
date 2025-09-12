@@ -30,10 +30,6 @@ public class Transfer {
     @Column(name = "amount", precision = 19, scale = 2, nullable = false)
     private BigDecimal amount;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "status", length = 32, nullable = false)
-    private TransferStatus status;
-
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;

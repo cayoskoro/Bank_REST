@@ -1,7 +1,7 @@
 package com.example.bankcards.controller.admin;
 
-import com.example.bankcards.dto.user.UserRequestDto;
-import com.example.bankcards.dto.user.UserResponseDto;
+import com.example.bankcards.dto.user.NewUserDto;
+import com.example.bankcards.dto.user.UserDto;
 import com.example.bankcards.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,9 +30,9 @@ public class UserAdminController {
             @ApiResponse(responseCode = "200", description = "Выдан список пользователей")
     })
     @GetMapping
-    public Collection<UserResponseDto> getAllUsers(@RequestParam(required = false) Collection<Long> ids,
-                                                   @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                                   @RequestParam(defaultValue = "10") @Positive int size) {
+    public Collection<UserDto> getAllUsers(@RequestParam(required = false) Collection<Long> ids,
+                                           @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                           @RequestParam(defaultValue = "10") @Positive int size) {
         return userService.getAllUsers(ids, from, size);
     }
 
@@ -43,8 +43,8 @@ public class UserAdminController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseDto addNewUser(@RequestBody @Valid UserRequestDto userRequestDto) {
-        return userService.addNewUser(userRequestDto);
+    public UserDto addNewUser(@RequestBody @Valid NewUserDto newUserDto) {
+        return userService.addNewUser(newUserDto);
     }
 
     @Operation(summary = "Удаление пользователя")

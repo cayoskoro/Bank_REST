@@ -19,7 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.YearMonth;
 import java.util.Collection;
 
 @Service
@@ -64,8 +63,10 @@ public class CardServiceImpl implements CardService {
     public CardDto addNewCard(NewCardDto newCardDto) {
         User user = getUserByIdOrElseThrow(newCardDto.getOwnerId());
         Card card = cardMapper.convertNewCardDtoToEntity(newCardDto);
-        card
-        return null;
+        card.setOwner(user);
+        CardDto cardDto = cardMapper.convertToDto(cardRepository.save(card));
+        log.info("Добавлена новая карта - {}", cardDto);
+        return cardDto;
     }
 
     @Override
@@ -89,6 +90,7 @@ public class CardServiceImpl implements CardService {
         throwIfCardBlocked(card);
 
         card.setStatus(CardStatus.BLOCKED);
+        card.setBlockRequest(false);
         CardDto cardDto = cardMapper.convertToDto(cardRepository.save(card));
         log.info("Карта заблокирована: {}", cardDto);
         return cardDto;
@@ -116,15 +118,6 @@ public class CardServiceImpl implements CardService {
         checkCardExists(cardId);
         cardRepository.deleteById(cardId);
         log.info("Карта id = {} удалена", cardId);
-    }
-
-    @Transactional
-    private void updateCardStatusIfExpired(Card card) {
-        log.info("Проверка на просрочку карты.");
-        if (card.getStatus() != CardStatus.EXPIRED && YearMonth.now().equals(card.getExpiresAt())) {
-            card.setStatus(CardStatus.EXPIRED);
-            log.info("Карта id = {} стала просроченной.", card.getId());
-        }
     }
 
     private void throwIfUserIsNotCardOwner(Card card, User user) {

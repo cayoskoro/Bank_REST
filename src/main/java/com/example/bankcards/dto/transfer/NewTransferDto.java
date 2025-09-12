@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 @Value
 @Builder(toBuilder = true)
-public class NewTransferRequestDto {
+public class NewTransferDto {
     @NotNull
     private final Long fromCard;
 

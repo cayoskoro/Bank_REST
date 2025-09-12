@@ -1,7 +1,7 @@
 package com.example.bankcards.service.impl;
 
-import com.example.bankcards.dto.user.UserRequestDto;
-import com.example.bankcards.dto.user.UserResponseDto;
+import com.example.bankcards.dto.user.NewUserDto;
+import com.example.bankcards.dto.user.UserDto;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.exception.NotFoundException;
 import com.example.bankcards.mapper.UserMapper;
@@ -25,23 +25,23 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
-    public Collection<UserResponseDto> getAllUsers(Collection<Long> ids, int from, int size) {
+    public Collection<UserDto> getAllUsers(Collection<Long> ids, int from, int size) {
         PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size);
         Page<User> users = ids == null || ids.isEmpty()
                 ? userRepository.findAll(pageRequest)
                 : userRepository.findByIdIn(ids, pageRequest);
-        Collection<UserResponseDto> userDtos = userMapper.convertToDtoCollection(users.getContent());
+        Collection<UserDto> userDtos = userMapper.convertToDtoCollection(users.getContent());
         log.info("Запрос пользователей по списку ids = {} - {}", ids, userDtos);
         return userDtos;
     }
 
     @Override
     @Transactional
-    public UserResponseDto addNewUser(UserRequestDto userRequestDto) {
-        User user = userMapper.convertToEntity(userRequestDto);
-        UserResponseDto userResponseDto = userMapper.convertToDto(userRepository.save(user));
-        log.info("Добавлен новый пользователь - {}", userResponseDto);
-        return userResponseDto;
+    public UserDto addNewUser(NewUserDto newUserDto) {
+        User user = userMapper.convertToEntity(newUserDto);
+        UserDto userDto = userMapper.convertToDto(userRepository.save(user));
+        log.info("Добавлен новый пользователь - {}", userDto);
+        return userDto;
     }
 
     @Override

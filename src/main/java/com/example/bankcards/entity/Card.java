@@ -30,8 +30,8 @@ public class Card {
     @Convert(converter = CardNumberEncryptor.class)
     private String cryptoNumber;
 
-    @Column(name = "last_four_numbers", length = 4, nullable = false)
-    private String lastFourNumbers;
+    @Column(name = "last_four_digits", length = 4, nullable = false)
+    private String lastFourDigits;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 32, nullable = false)
@@ -41,9 +41,9 @@ public class Card {
     private BigDecimal balance;
 
     @Column(name = "block_request", nullable = false)
-    private boolean blockRequest = false;
+    private boolean blockRequest;
 
-    @Column(name = "expired_at", nullable = false)
+    @Column(name = "expires_at", nullable = false)
     private YearMonth expiresAt;
 
     @Column(name = "created_at", nullable = false)
@@ -52,5 +52,5 @@ public class Card {
 
     @Column(name = "updated_at")
     @UpdateTimestamp
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
 }

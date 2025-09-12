@@ -1,7 +1,7 @@
 package com.example.bankcards.service.impl;
 
-import com.example.bankcards.dto.transfer.NewTransferRequestDto;
-import com.example.bankcards.dto.transfer.TransferResponseDto;
+import com.example.bankcards.dto.transfer.NewTransferDto;
+import com.example.bankcards.dto.transfer.TransferDto;
 import com.example.bankcards.entity.*;
 import com.example.bankcards.exception.ConflictException;
 import com.example.bankcards.exception.NotFoundException;
@@ -29,58 +29,35 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     @Transactional
-    public TransferResponseDto transferInternalFunds(long userId, NewTransferRequestDto newTransferRequestDto) {
-        User user = getUserByIdOrElseThrow(userId);
+    public TransferDto transferInternalFunds(long userId, NewTransferDto newTransferDto) {
+        checkUserExists(userId);
 
-        Card fromCard = getCardByIdOrElseThrow(newTransferRequestDto.getFromCard());
-        throwIfUserIsNotCardOwner(fromCard, user.getId());
+        Card fromCard = getCardByIdOrElseThrow(newTransferDto.getFromCard());
+        throwIfUserIsNotCardOwner(fromCard, userId);
         throwIfCardIsNotActive(fromCard);
 
-        Card toCard = getCardByIdOrElseThrow(newTransferRequestDto.getToCard());
-        throwIfUserIsNotCardOwner(toCard, user.getId());
+        Card toCard = getCardByIdOrElseThrow(newTransferDto.getToCard());
+        throwIfUserIsNotCardOwner(toCard, userId);
         throwIfCardIsNotActive(toCard);
 
-        if (fromCard.getBalance().compareTo(newTransferRequestDto.getAmount()) < 0) {
+        if (fromCard.getBalance().compareTo(newTransferDto.getAmount()) < 0) {
             log.info("Трансфер невозможен. Не хватает средств на карте id = {}", fromCard.getId());
-            throw new ConflictException("Трансфер невозможен. Не хватает средств на карте id = " + fromCard.getId());
+            throw new ConflictException("Трансфер невозможен. Не хватает средств на карте.");
         }
 
-        fromCard.setBalance(fromCard.getBalance().subtract(newTransferRequestDto.getAmount()));
-        toCard.setBalance(fromCard.getBalance().add(newTransferRequestDto.getAmount()));
+        fromCard.setBalance(fromCard.getBalance().subtract(newTransferDto.getAmount()));
+        toCard.setBalance(fromCard.getBalance().add(newTransferDto.getAmount()));
         cardRepository.saveAll(List.of(toCard, fromCard));
 
         Transfer transfer = Transfer.builder()
                 .fromCard(fromCard)
                 .toCard(toCard)
-                .amount(newTransferRequestDto.getAmount())
-                .status(TransferStatus.SUCCESS)
+                .amount(newTransferDto.getAmount())
                 .build();
-        TransferResponseDto transferResponseDto = transferMapper.convertToDto(transferRepository.save(transfer));
-        log.info("Внутренний трансфер средств произведен - {}", transferResponseDto);
-        return transferResponseDto;
+        TransferDto transferDto = transferMapper.convertToDto(transferRepository.save(transfer));
+        log.info("Внутренний трансфер средств произведен - {}", transferDto);
+        return transferDto;
     }
-
-/*    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private void saveRejectedTransfer(NewTransferRequestDto newTransferRequestDto) {
-        Transfer transfer = Transfer.builder()
-                .fromCard()
-                .toCard()
-                .amount(newTransferRequestDto.getAmount())
-                .status(TransferStatus.REJECTED)
-                .build();
-        transferRepository.save(transfer);
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private void saveErrorTransfer(NewTransferRequestDto newTransferRequestDto) {
-        Transfer transfer = Transfer.builder()
-                .fromCard()
-                .toCard()
-                .amount(newTransferRequestDto.getAmount())
-                .status(TransferStatus.ERROR)
-                .build();
-        transferRepository.save(transfer);
-    }*/
 
     private void throwIfUserIsNotCardOwner(Card card, long userId) {
         if (!card.getOwner().getId().equals(userId)) {
@@ -105,10 +82,10 @@ public class TransferServiceImpl implements TransferService {
         });
     }
 
-    private User getUserByIdOrElseThrow(long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> {
+    private void checkUserExists(long userId) {
+        if (!userRepository.existsById(userId)) {
             log.info("Пользователя id = {} не существует", userId);
-            return new NotFoundException("Пользователя id = " + userId + " не существует");
-        });
+            throw new NotFoundException("Пользователя id = " + userId + " не существует");
+        }
     }
 }

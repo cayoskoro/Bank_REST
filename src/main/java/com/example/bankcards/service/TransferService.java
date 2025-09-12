@@ -1,8 +1,8 @@
 package com.example.bankcards.service;
 
-import com.example.bankcards.dto.transfer.NewTransferRequestDto;
-import com.example.bankcards.dto.transfer.TransferResponseDto;
+import com.example.bankcards.dto.transfer.NewTransferDto;
+import com.example.bankcards.dto.transfer.TransferDto;
 
 public interface TransferService {
-    public TransferResponseDto transferInternalFunds(long userId, NewTransferRequestDto newTransferRequestDto);
+    public TransferDto transferInternalFunds(long userId, NewTransferDto newTransferDto);
 }

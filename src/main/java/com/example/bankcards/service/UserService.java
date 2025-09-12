@@ -1,14 +1,14 @@
 package com.example.bankcards.service;
 
-import com.example.bankcards.dto.user.UserRequestDto;
-import com.example.bankcards.dto.user.UserResponseDto;
+import com.example.bankcards.dto.user.NewUserDto;
+import com.example.bankcards.dto.user.UserDto;
 
 import java.util.Collection;
 
 public interface UserService {
-    public Collection<UserResponseDto> getAllUsers(Collection<Long> ids, int from, int size);
+    public Collection<UserDto> getAllUsers(Collection<Long> ids, int from, int size);
 
-    public UserResponseDto addNewUser(UserRequestDto userRequestDto);
+    public UserDto addNewUser(NewUserDto newUserDto);
 
     public void deleteUser(long userId);
 }
