@@ -43,9 +43,13 @@ springdoc:
   swagger-ui:
     path: /api-docs-ui
 
+security:
+  jwt:
+    secret-key: ${SECURITY_JWT_SECRET_KEY:5pAq6zRyX8bC3dV2wS7gN1mK9jF0hL4tUoP6iBvE3nG8xZaQrY7cW2fA}
+    expiration-ms: ${SECURITY_JWT_EXPIRATION_MS:3600000}
+
 encryptor:
   aes:
     iv-length: ${ENCRYPTOR_AES_IV_LENGTH:12}
     tag-length: ${ENCRYPTOR_AES_TAG_LENGTH:16}
     passphrase: ${ENCRYPTOR_AES_PASSPHRASE:testPassphrase123!}
-

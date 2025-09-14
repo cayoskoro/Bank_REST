@@ -4,7 +4,6 @@ package com.example.bankcards.controller.admin;
 import com.example.bankcards.dto.card.CardDto;
 import com.example.bankcards.dto.card.NewCardDto;
 import com.example.bankcards.service.CardService;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

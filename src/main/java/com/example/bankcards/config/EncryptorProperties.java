@@ -1,11 +1,21 @@
 package com.example.bankcards.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @ConfigurationProperties(prefix = "encryptor.aes")
+@Validated
 public final class EncryptorProperties {
+    @NotNull
     private final Integer ivLength;
+
+    @NotNull
     private final Integer tagLength;
+
+    @NotBlank
     private final String passphrase;
 
     public EncryptorProperties(Integer ivLength, Integer tagLength, String passphrase) {
