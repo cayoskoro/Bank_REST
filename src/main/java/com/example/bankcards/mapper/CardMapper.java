@@ -10,7 +10,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.control.DeepClone;
 
-import java.time.YearMonth;
 import java.util.Collection;
 
 @Mapper(componentModel = "spring", mappingControl = DeepClone.class)

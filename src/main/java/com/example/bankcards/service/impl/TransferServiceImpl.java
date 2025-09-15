@@ -2,7 +2,9 @@ package com.example.bankcards.service.impl;
 
 import com.example.bankcards.dto.transfer.NewTransferDto;
 import com.example.bankcards.dto.transfer.TransferDto;
-import com.example.bankcards.entity.*;
+import com.example.bankcards.entity.Card;
+import com.example.bankcards.entity.CardStatus;
+import com.example.bankcards.entity.Transfer;
 import com.example.bankcards.exception.ConflictException;
 import com.example.bankcards.exception.NotFoundException;
 import com.example.bankcards.mapper.TransferMapper;

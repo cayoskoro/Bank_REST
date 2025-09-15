@@ -37,6 +37,15 @@ public class OpenApiConfig {
     }
 
     @Bean
+    public GroupedOpenApi authPublicGroup() {
+        return GroupedOpenApi.builder()
+                .group("public-auth")
+                .packagesToScan("com.example.bankcards.controller")
+                .pathsToMatch("/auth/**")
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi cardAdminGroup() {
         return GroupedOpenApi.builder()
                 .group("admin-cards")
