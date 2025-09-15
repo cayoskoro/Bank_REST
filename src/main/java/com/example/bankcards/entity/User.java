@@ -3,6 +3,7 @@ package com.example.bankcards.entity;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -46,7 +47,7 @@ public class User implements UserDetails {
     private LocalDateTime updatedAt;
 
     @Override
-    public Collection<Role> getAuthorities() {
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;
     }
 

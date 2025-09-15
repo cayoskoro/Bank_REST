@@ -18,7 +18,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 @RestController
-@RequestMapping(name = "/admin/users")
+@RequestMapping(path = "/admin/users")
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Admin: пользователи", description = "Admin API для работы с пользователями")

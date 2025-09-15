@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(name = "/auth")
+@RequestMapping(path = "/auth")
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Public: Аутентификация", description = "Public API для аутентификации")

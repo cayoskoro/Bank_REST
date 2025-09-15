@@ -20,7 +20,7 @@ public class TokenService {
 
     public String generateToken(UserDetails userDetails) {
         final long now = System.currentTimeMillis();
-        final long expiration = now + jwtProperties.getJwtExpirationMs();
+        final long expiration = now + jwtProperties.getExpirationMs();
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(now))

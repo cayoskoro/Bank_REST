@@ -14,8 +14,8 @@ spring:
   config:
     on-profile: ci,test
   datasource:
-    driver-class-name: ${SPRING_DATASOURCE_DRIVER-CLASS-NAME:org.h2.Driver}
-    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:bank}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER-CLASS-NAME:org.postgresql.Driver}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/bank}
     username: ${SPRING_DATASOURCE_USERNAME:test}
     password: ${SPRING_DATASOURCE_PASSWORD:test}
   jpa:
@@ -23,11 +23,15 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        dialect: ${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT:org.hibernate.dialect.H2Dialect}
+        dialect: ${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT:org.hibernate.dialect.PostgreSQL10Dialect}
         format_sql: true
   sql:
     init:
-      mode: embedded
+      mode: never
+  liquibase:
+    enabled: true
+    drop-first: true
+    change-log: classpath:db/migration/db.changelog-master.yml
 
 logging.level.org.springframework:
   orm:
@@ -35,6 +39,7 @@ logging.level.org.springframework:
     jpa.JpaTransactionManager: DEBUG
   transaction: INFO
   transaction.interceptor: TRACE
+  security: DEBUG
 
 springdoc:
   api-docs:
@@ -42,6 +47,7 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /api-docs-ui
+    url: /api-docs
 
 security:
   jwt:

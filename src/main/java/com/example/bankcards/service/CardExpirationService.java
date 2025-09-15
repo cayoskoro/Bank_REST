@@ -20,7 +20,7 @@ public class CardExpirationService {
 
     @Scheduled(cron = "0 0 1 1 * *")
     @Transactional
-    public void updateCardsWithExpiredDate(Card card) {
+    public void updateCardsWithExpiredDate() {
         log.info("Плановое обновление всех карт с истекшим expiresAt в состояние status = EXPIRED началось.");
         YearMonth currentMonth = YearMonth.now();
         Collection<Card> cards = cardRepository.findAllByStatusNotAndExpiresAtLessThanEqual(CardStatus.EXPIRED,

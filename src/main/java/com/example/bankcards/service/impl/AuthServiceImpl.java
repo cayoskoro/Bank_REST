@@ -34,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private final TokenService tokenService;
 
     @Override
+    @Transactional
     public void register(RegisterDto registerDto) {
         log.info("Регистрация пользователя");
         String defaultRole = "ROLE_USER";

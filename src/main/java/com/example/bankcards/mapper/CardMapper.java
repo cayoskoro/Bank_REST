@@ -10,9 +10,10 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.control.DeepClone;
 
+import java.time.YearMonth;
 import java.util.Collection;
 
-@Mapper(componentModel = "spring", mappingControl = DeepClone.class)
+@Mapper(componentModel = "spring", mappingControl = DeepClone.class, imports = {YearMonth.class})
 public interface CardMapper {
     @Mapping(target = "ownerId", source = "owner.id")
     @Mapping(target = "panMask", source = "lastFourDigits", qualifiedByName = "panMask")
@@ -25,7 +26,7 @@ public interface CardMapper {
 
     @Mapping(target = "cryptoNumber", source = "number")
     @Mapping(target = "lastFourDigits", source = "number", qualifiedByName = "substringLastFourDigits")
-    @Mapping(target = "status", constant = "ACTIVATE")
+    @Mapping(target = "status", constant = "ACTIVE")
     @Mapping(target = "blockRequest", constant = "false")
     @Mapping(target = "expiresAt", source = "expiresAt", defaultExpression = "java(YearMonth.now().plusMonths(24))")
     public Card convertNewCardDtoToEntity(NewCardDto dto);

@@ -1,34 +1,32 @@
 package com.example.bankcards.config;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Component
+@ConstructorBinding
 @ConfigurationProperties(prefix = "security.jwt")
 @Validated
 public final class JwtProperties {
     @NotBlank
     private final String secretKey;
 
-    @JsonProperty("expiration-ms")
     @NotNull
-    private final Integer jwtExpirationMs;
+    private final Integer expirationMs;
 
-    public JwtProperties(String secretKey, Integer jwtExpirationMs) {
+    public JwtProperties(String secretKey, Integer expirationMs) {
         this.secretKey = secretKey;
-        this.jwtExpirationMs = jwtExpirationMs;
+        this.expirationMs = expirationMs;
     }
 
     public String getSecretKey() {
         return secretKey;
     }
 
-    public Integer getJwtExpirationMs() {
-        return jwtExpirationMs;
+    public Integer getExpirationMs() {
+        return expirationMs;
     }
 }

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(name = "/users/{userId}/transfers")
+@RequestMapping(path = "/users/{userId}/transfers")
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Private: переводы", description = "Private API для работы с переводами")
