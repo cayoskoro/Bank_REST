@@ -1,0 +1,273 @@
+databaseChangeLog:
+- changeSet:
+    id: 1757966384917-1
+    author: pasto (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: cards_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: balance
+            type: numeric(19, 2)
+        - column:
+            constraints:
+              nullable: false
+            name: block_request
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: created_at
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: crypto_number
+            type: VARCHAR(512)
+        - column:
+            constraints:
+              nullable: false
+            name: expires_at
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: last_four_digits
+            type: VARCHAR(4)
+        - column:
+            constraints:
+              nullable: false
+            name: status
+            type: VARCHAR(32)
+        - column:
+            name: updated_at
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: owner_id
+            type: BIGINT
+        tableName: cards
+- changeSet:
+    id: 1757966384917-2
+    author: pasto (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: roles_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: name
+            type: VARCHAR(32)
+        tableName: roles
+- changeSet:
+    id: 1757966384917-3
+    author: pasto (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: transfers_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: amount
+            type: numeric(19, 2)
+        - column:
+            constraints:
+              nullable: false
+            name: created_at
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: from_card_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: to_card_id
+            type: BIGINT
+        tableName: transfers
+- changeSet:
+    id: 1757966384917-4
+    author: pasto (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: user_role_pkey
+            name: user_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: user_role_pkey
+            name: role_id
+            type: BIGINT
+        tableName: user_role
+- changeSet:
+    id: 1757966384917-5
+    author: pasto (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: users_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: created_at
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: email
+            type: VARCHAR(254)
+        - column:
+            constraints:
+              nullable: false
+            name: password
+            type: VARCHAR(128)
+        - column:
+            name: updated_at
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: username
+            type: VARCHAR(128)
+        tableName: users
+- changeSet:
+    id: 1757966384917-6
+    author: pasto (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: email
+        constraintName: uk_6dotkott2kjsp8vw4d0m25fb7
+        tableName: users
+- changeSet:
+    id: 1757966384917-7
+    author: pasto (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: name
+        constraintName: uk_ofx66keruapi6vyqpv6f2or37
+        tableName: roles
+- changeSet:
+    id: 1757966384917-8
+    author: pasto (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: username
+        constraintName: uk_r43af9ap4edm43mmtq01oddj6
+        tableName: users
+- changeSet:
+    id: 1757966384917-9
+    author: pasto (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: from_card_id
+        baseTableName: transfers
+        constraintName: fka0vsagda2wrdovb84027jdc20
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: cards
+        validate: true
+- changeSet:
+    id: 1757966384917-10
+    author: pasto (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: to_card_id
+        baseTableName: transfers
+        constraintName: fkb907hsqweohi735tmx0xpgglj
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: cards
+        validate: true
+- changeSet:
+    id: 1757966384917-11
+    author: pasto (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: user_id
+        baseTableName: user_role
+        constraintName: fkj345gk1bovqvfame88rcx7yyx
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: users
+        validate: true
+- changeSet:
+    id: 1757966384917-12
+    author: pasto (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: owner_id
+        baseTableName: cards
+        constraintName: fkngyusa2xehxe90oim767h2h4a
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: users
+        validate: true
+- changeSet:
+    id: 1757966384917-13
+    author: pasto (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: role_id
+        baseTableName: user_role
+        constraintName: fkt7e7djp752sqn6w22i6ocqy6q
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: roles
+        validate: true
+
