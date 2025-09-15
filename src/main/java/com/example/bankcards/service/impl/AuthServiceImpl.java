@@ -3,7 +3,10 @@ package com.example.bankcards.service.impl;
 import com.example.bankcards.dto.auth.LoginRequestDto;
 import com.example.bankcards.dto.auth.LoginResponseDto;
 import com.example.bankcards.dto.auth.RegisterDto;
+import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.User;
+import com.example.bankcards.exception.NotFoundException;
+import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.security.TokenService;
 import com.example.bankcards.service.AuthService;
@@ -25,18 +28,25 @@ import java.util.Set;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
 
     @Override
     public void register(RegisterDto registerDto) {
-        log.info("Регистрация пользователя. ");
+        log.info("Регистрация пользователя");
+        String defaultRole = "ROLE_USER";
+        Role role = roleRepository.findByName(defaultRole).orElseThrow(() -> {
+            log.info("Ошибка при регистрации пользователя. Роль = {} не существует среди возможных.", defaultRole);
+            return new NotFoundException("Ошибка при регистрации пользователя. Роль = " + defaultRole
+                    + " не существует среди возможных.");
+        });
         User user = User.builder()
                 .username(registerDto.getUsername())
                 .password(passwordEncoder.encode(registerDto.getPassword()))
                 .email(registerDto.getEmail())
-                .roles(Set.of())
+                .roles(Set.of(role))
                 .build();
         userRepository.save(user);
     }
