@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Collection<UserDto> getAllUsers(Collection<Long> ids, int from, int size) {
-        PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size);
+        PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size, Sort.by("id").ascending());
         Page<User> users = ids == null || ids.isEmpty()
                 ? userRepository.findAll(pageRequest)
                 : userRepository.findByIdIn(ids, pageRequest);
